@@ -49,7 +49,7 @@ export default function NoteForm() {
       tag: (formData.get('tag') as NoteTag) || 'Todo',
     };
 
-    mutate({ ...payload, categoryId: payload.categoryId || '' });
+    mutate(payload);
   };
 
   return (

@@ -19,12 +19,15 @@ export default function EditProfilePage() {
 
   const setUser = useAuthStore(
     (state) => state.setUser
-  );
+    );
+    
+    const [username, setUsername] = useState('');
 
-  
-   const [username, setUsername] = useState(
- user?.username ?? ''
-);
+useEffect(() => {
+  if (user?.username) {
+    setUsername(user.username);
+  }
+}, [user?.username]);
 
   async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
