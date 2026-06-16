@@ -21,13 +21,17 @@ export default function EditProfilePage() {
     (state) => state.setUser
     );
     
-    const [username, setUsername] = useState('');
+    // Initialize username from user to avoid setting state synchronously in an effect
+    const [username, setUsername] = useState(() => user?.username ?? '');
 
-useEffect(() => {
-  if (user?.username) {
-    setUsername(user.username);
-  }
-}, [user?.username]);
+    useEffect(() => {
+      // If user updates and local username is empty (not edited), sync it.
+      // Defer the state update to avoid calling setState synchronously within the effect.
+      if (user?.username && username === '') {
+        const t = setTimeout(() => setUsername(user.username), 0);
+        return () => clearTimeout(t);
+      }
+    }, [user?.username, username]);
 
   async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();

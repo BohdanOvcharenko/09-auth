@@ -52,7 +52,7 @@ export async function checkSession() {
     },
   });
 
-  return response.data;
+  return response;
 }
 
 export async function getMe(): Promise<User> {
