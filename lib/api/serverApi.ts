@@ -1,38 +1,68 @@
-import { Note } from "@/types/note";
-import { User } from "@/types/user";
-import axios from "axios";
+import { cookies } from 'next/headers';
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL + '/api';
-const api = axios.create({ baseURL });
+import { api } from './api';
 
-export const fetchServerNotes = async (): Promise<Note[]> => {
-  const response = await api.get<Note[]>('/notes');
+import { Note } from '@/types/note';
+import { User } from '@/types/user';
+
+async function getCookieHeader() {
+  const cookieStore = await cookies();
+
+  return cookieStore.toString();
+}
+
+export async function fetchNotes(params?: {
+  page?: number;
+  perPage?: number;
+  search?: string;
+  tag?: string;
+}) {
+  const cookie = await getCookieHeader();
+
+  const response = await api.get('/notes', {
+    params,
+    headers: {
+      Cookie: cookie,
+    },
+  });
+
   return response.data;
-};
+}
 
-export const fetchServerNoteById = async (id: string): Promise<Note> => {
-  const response = await api.get<Note>(`/notes/${id}`);
+export async function fetchNoteById(
+  id: string
+): Promise<Note> {
+  const cookie = await getCookieHeader();
+
+  const response = await api.get(`/notes/${id}`, {
+    headers: {
+      Cookie: cookie,
+    },
+  });
+
   return response.data;
-};
+}
 
-export const checkSession = async (): Promise<{ isAuthenticated: boolean; user?: any }> => {
-  try {
-    const response = await api.get('/auth/check-session', { withCredentials: true });
-    return { isAuthenticated: response.data.isAuthenticated, user: response.data.user };
-  } catch (error) {
-    return { isAuthenticated: false };
-  } 
-};
+export async function checkSession() {
+  const cookie = await getCookieHeader();
 
-export const register = async (email: string, password: string): Promise<void> => {
-  await api.post('/auth/register', { email, password }, { withCredentials: true });
-};
+  const response = await api.get('/auth/session', {
+    headers: {
+      Cookie: cookie,
+    },
+  });
 
-export const getMe = async (): Promise<User> => {
-  const response = await api.get<User>('/auth/me', { withCredentials: true });
   return response.data;
-};
+}
 
-export const login = async (email: string, password: string): Promise<void> => {
-  await api.post('/auth/login', { email, password }, { withCredentials: true });
-};
+export async function getMe(): Promise<User> {
+  const cookie = await getCookieHeader();
+
+  const response = await api.get('/users/me', {
+    headers: {
+      Cookie: cookie,
+    },
+  });
+
+  return response.data;
+}

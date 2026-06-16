@@ -1,33 +1,85 @@
+'use client';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
 import css from './AuthNavigation.module.css';
 
-const AuthNavigation = () => {
-    return (
-      <><li className={css.navigationItem}>
-  <a href="/profile" prefetch={false} className={css.navigationLink}>
-    Profile
-  </a>
-</li>
+import { logout } from '@/lib/api/clientApi';
+import { useAuthStore } from '@/lib/store/authStore';
 
-<li className={css.navigationItem}>
-  <p className={css.userEmail}>User email</p>
-  <button className={css.logoutButton}>
-    Logout
-  </button>
-</li>
+export default function AuthNavigation() {
+  const router = useRouter();
 
-<li className={css.navigationItem}>
-  <a href="/sign-in" prefetch={false} className={css.navigationLink}>
-    Login
-  </a>
-</li>
-
-<li className={css.navigationItem}>
-  <a href="/sign-up" prefetch={false} className={css.navigationLink}>
-    Sign up
-  </a>
-</li></>
-    
+  const isAuthenticated = useAuthStore(
+    (state) => state.isAuthenticated
   );
-};
 
-export default AuthNavigation;
+  const user = useAuthStore((state) => state.user);
+
+  const clearIsAuthenticated = useAuthStore(
+    (state) => state.clearIsAuthenticated
+  );
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+
+      clearIsAuthenticated();
+
+      router.push('/sign-in');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  if (isAuthenticated) {
+    return (
+      <>
+        <li className={css.navigationItem}>
+          <Link
+            href="/profile"
+            className={css.navigationLink}
+          >
+            Profile
+          </Link>
+        </li>
+
+        <li className={css.navigationItem}>
+          <p className={css.userEmail}>
+            {user?.email}
+          </p>
+
+          <button
+            onClick={handleLogout}
+            className={css.logoutButton}
+          >
+            Logout
+          </button>
+        </li>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <li className={css.navigationItem}>
+        <Link
+          href="/sign-in"
+          className={css.navigationLink}
+        >
+          Login
+        </Link>
+      </li>
+
+      <li className={css.navigationItem}>
+        <Link
+          href="/sign-up"
+          className={css.navigationLink}
+        >
+          Register
+        </Link>
+      </li>
+    </>
+  );
+}

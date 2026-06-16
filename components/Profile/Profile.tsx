@@ -1,5 +1,7 @@
 import css from './ProfilePage.module.css';
 
+
+
 const Profile = () => {
 
 
@@ -8,7 +10,7 @@ const Profile = () => {
   <div className={css.profileCard}>
       <div className={css.header}>
 	     <h1 className={css.formTitle}>Profile Page</h1>
-	     <a src="/profile/edit" className={css.editProfileButton}>
+	     <a href="/profile/edit" className={css.editProfileButton}>
 	       Edit Profile
 	     </a>
 	   </div>

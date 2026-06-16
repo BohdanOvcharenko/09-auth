@@ -1,100 +1,79 @@
-import axios from "axios";
-import type { Note } from "../../types/note";
-import { User } from "@/types/user";
+import { api } from './api';
+import { User } from '@/types/user';
+import { Note } from '@/types/note';
 
-
-
-export interface NotesResponseProps {
-  notes: Note[];
-  totalPages: number;
+interface AuthData {
+  email: string;
+  password: string;
 }
 
-interface FetchNotesProps {
-  page: number;
-  search: string;
+export async function register(data: AuthData): Promise<User> {
+  const response = await api.post('/auth/register', data);
+
+  return response.data;
+}
+
+export async function login(data: AuthData): Promise<User> {
+  const response = await api.post('/auth/login', data);
+
+  return response.data;
+}
+
+export async function logout(): Promise<void> {
+  await api.post('/auth/logout');
+}
+
+export async function checkSession() {
+  const response = await api.get('/auth/session');
+
+  return response.data;
+}
+
+export async function getMe(): Promise<User> {
+  const response = await api.get('/users/me');
+
+  return response.data;
+}
+
+export async function updateMe(
+  data: Partial<User>
+): Promise<User> {
+  const response = await api.patch('/users/me', data);
+
+  return response.data;
+}
+
+export async function fetchNotes(params: {
+  page?: number;
+  perPage?: number;
+  search?: string;
   tag?: string;
+}) {
+  const response = await api.get('/notes', {
+    params,
+  });
+
+  return response.data;
 }
 
-export const fetchNotes = async ({page, search, tag,}: FetchNotesProps): Promise<NotesResponseProps> => {
-  const response = await axios.get<NotesResponseProps>(
-    'https://notehub-api.goit.study/api/notes',
-    {
-      params: {
-        page,
-        search,
-        ...(tag && tag !== 'all' ? { tag } : {}),
-      },
-      headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-      }
-    }   
-    );
-     return response.data;
+export async function fetchNoteById(id: string): Promise<Note> {
+  const response = await api.get(`/notes/${id}`);
+
+  return response.data;
 }
 
-
-export type CreateNoteProps = {
+export async function createNote(noteData: {
   title: string;
   content: string;
-  categoryId: string;
+  tag: string;
+}) {
+  const response = await api.post('/notes', noteData);
+
+  return response.data;
 }
 
-export const fetchNoteById = async (id: string): Promise<Note> => {
-    const response = await axios.get <Note>(`https://notehub-api.goit.study/api/notes/${id}`, {headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-      }});
-    return response.data;
-};
+export async function deleteNote(id: string) {
+  const response = await api.delete(`/notes/${id}`);
 
-export const createNote = async (newNote: CreateNoteProps): Promise<Note> => {
-    const response = await axios.post <Note>('https://notehub-api.goit.study/api/notes', newNote, {headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-      }});
-    return response.data;
-};
-
-export const deleteNote = async (id: string): Promise<Note> => {
-    const response = await axios.delete <Note>(`https://notehub-api.goit.study/api/notes/${id}`, {headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-      }});
-    return response.data;
-};  
-
-export const getCategories = async (): Promise<string[]> => {
-  const response = await axios.get<string[]>(`https://notehub-api.goit.study/api/notes/categories`, { headers: {
-    Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-  }});
   return response.data;
-};
-
-export const register = async (email: string, password: string): Promise<void> => {
-  await axios.post('https://notehub-api.goit.study/api/auth/register', { email, password });
-};
-
-export const login = async (email: string, password: string): Promise<string> => {
-  const response = await axios.post<{ token: string }>('https://notehub-api.goit.study/api/auth/login', { email, password });
-  return response.data.token;
-};
-
-export const checkSession = async (token: string): Promise<boolean> => {
-  try {
-    await axios.get('https://notehub-api.goit.study/api/auth/check', { headers: { Authorization: `Bearer ${token}` } });
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-export const logout = async (token: string): Promise<void> => {
-  await axios.post('https://notehub-api.goit.study/api/auth/logout', {}, { headers: { Authorization: `Bearer ${token}` } });
-};
-
-export const getMe = async (token: string): Promise<User> => {
-  const response = await axios.get<User>('https://notehub-api.goit.study/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
-  return response.data;
-};
-
-export const updateMe = async (token: string, email: string, username: string): Promise<User> => {
-  const response = await axios.put<User>('https://notehub-api.goit.study/api/auth/me', { email, username }, { headers: { Authorization: `Bearer ${token}` } });
-  return response.data;
-};
+}
