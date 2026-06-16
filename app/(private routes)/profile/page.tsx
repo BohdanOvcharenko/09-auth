@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import css from './Profile.module.css';
+import css from './ProfilePage.module.css';
 
 import { getMe } from '@/lib/api/serverApi';
 

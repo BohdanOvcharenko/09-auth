@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-import css from './EditProfile.module.css';
+import css from './EditProfilePage.module.css';
 
 import { updateMe } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
@@ -21,28 +21,26 @@ export default function EditProfilePage() {
     (state) => state.setUser
   );
 
-  const [username, setUsername] = useState(
-    user?.username ?? ''
-  );
+  
+   const [username, setUsername] = useState(
+ user?.username ?? ''
+);
 
-  const handleSubmit = async (
-    e: React.FormEvent
-  ) => {
-    e.preventDefault();
+  async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
 
-    try {
-      const updatedUser =
-        await updateMe({
-          username,
-        });
+        try {
+            const updatedUser = await updateMe({
+                username,
+            });
 
-      setUser(updatedUser);
+            setUser(updatedUser);
 
-      router.push('/profile');
-    } catch (error) {
-      console.error(error);
+            router.push('/profile');
+        } catch (error) {
+            console.error(error);
+        }
     }
-  };
 
   return (
     <main className={css.mainContent}>

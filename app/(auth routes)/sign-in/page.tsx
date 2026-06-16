@@ -4,7 +4,7 @@ import { FormEvent, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import css from './SignIn.module.css';
+import css from './SignInPage.module.css';
 
 import { login } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
